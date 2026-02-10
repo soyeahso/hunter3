@@ -5,7 +5,7 @@ external tools. It manages conversations and sessions through a configurable
 WebSocket-based gateway.
 
 hunter3 is able to be self-modifying and reprogrammable on the fly. Simply
-prompt it with the changes you want, it will modify and rebuild itself,
+prompt it with the changes you want and it will modify and rebuild itself,
 automatically reconnecting to the IRC server. If you break it, just drop down
 into your terminal and fix it using Claude or any number of other CLI tools.
 
