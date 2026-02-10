@@ -155,7 +155,9 @@ Hunter3 includes 14 built-in MCP (Model Context Protocol) servers in `cmd/mcp-*`
 Web and news search via the Brave Search API.
 
 **Tools:** `brave_web_search`, `brave_news_search`
+
 **Config:** `BRAVE_API_KEY` env var ([get key](https://brave.com/search/api/))
+
 **Details:** [cmd/mcp-brave/README.md](cmd/mcp-brave/README.md)
 
 ### mcp-curl -- HTTP Client
@@ -163,7 +165,9 @@ Web and news search via the Brave Search API.
 Wraps the system `curl` command with full option support.
 
 **Tools:** `curl`
+
 **Config:** Requires `curl` in PATH
+
 **Details:** [cmd/mcp-curl/README.md](cmd/mcp-curl/README.md)
 
 ### mcp-digitalocean -- DigitalOcean
@@ -171,7 +175,9 @@ Wraps the system `curl` command with full option support.
 Manage DigitalOcean droplets, SSH keys, networking, and tags via the official API.
 
 **Tools:** `list_droplets`, `create_droplet`, `delete_droplet`, `power_on_droplet`, `power_off_droplet`, `reboot_droplet`, `shutdown_droplet`, `power_cycle_droplet`, `resize_droplet`, `snapshot_droplet`, `get_droplet`, `get_droplet_action`, `list_ssh_keys`, `create_ssh_key`, `delete_ssh_key`, `list_regions`, `list_sizes`, `list_images`, `list_tags`, `create_tag`, `delete_tag`, `tag_resources`, `untag_resources`, `get_account`
+
 **Config:** `DIGITALOCEAN_TOKEN` env var
+
 **Details:** [cmd/mcp-digitalocean/README.md](cmd/mcp-digitalocean/README.md)
 
 ### mcp-docker -- Docker
@@ -179,7 +185,9 @@ Manage DigitalOcean droplets, SSH keys, networking, and tags via the official AP
 Manage containers, images, networks, volumes, and Compose projects via the Docker CLI.
 
 **Tools:** `docker_ps`, `docker_run`, `docker_start`, `docker_stop`, `docker_restart`, `docker_rm`, `docker_exec`, `docker_logs`, `docker_inspect`, `docker_stats`, `docker_images`, `docker_pull`, `docker_push`, `docker_rmi`, `docker_build`, `docker_tag`, `docker_network_ls`, `docker_network_create`, `docker_network_rm`, `docker_network_connect`, `docker_network_disconnect`, `docker_volume_ls`, `docker_volume_create`, `docker_volume_rm`, `docker_volume_inspect`, `docker_compose_up`, `docker_compose_down`, `docker_compose_ps`, `docker_compose_logs`, `docker_info`, `docker_version`, `docker_system_df`, `docker_system_prune`
+
 **Config:** Requires `docker` in PATH
+
 **Details:** [cmd/mcp-docker/README.md](cmd/mcp-docker/README.md)
 
 ### mcp-fetch-website -- HTTP Fetch
@@ -187,7 +195,9 @@ Manage containers, images, networks, volumes, and Compose projects via the Docke
 Fetch web pages and APIs with SSRF protection. Supports image responses (base64).
 
 **Tools:** `fetch`
+
 **Config:** None
+
 **Details:** [cmd/mcp-fetch-website/README.md](cmd/mcp-fetch-website/README.md)
 
 ### mcp-filesystem -- Filesystem
@@ -195,7 +205,9 @@ Fetch web pages and APIs with SSRF protection. Supports image responses (base64)
 Sandboxed file operations restricted to specified allowed directories. Symlink-aware path validation.
 
 **Tools:** `read_file`, `read_text_file`, `read_media_file`, `read_multiple_files`, `write_file`, `edit_file`, `create_directory`, `list_directory`, `list_directory_with_sizes`, `directory_tree`, `move_file`, `search_files`, `get_file_info`, `list_allowed_directories`
+
 **Config:** Pass allowed directories as CLI args
+
 **Details:** [cmd/mcp-filesystem/README.md](cmd/mcp-filesystem/README.md)
 
 ### mcp-gdrive -- Google Drive
@@ -203,7 +215,9 @@ Sandboxed file operations restricted to specified allowed directories. Symlink-a
 File management on Google Drive via OAuth2: list, upload, download, share, search.
 
 **Tools:** `list_files`, `get_file_info`, `download_file`, `upload_file`, `create_folder`, `delete_file`, `search_files`, `share_file`
+
 **Config:** OAuth2 credentials at `~/.hunter3/gdrive-credentials.json` (or `GDRIVE_CREDENTIALS_FILE`)
+
 **Details:** [cmd/mcp-gdrive/README.md](cmd/mcp-gdrive/README.md)
 
 ### mcp-gh -- GitHub CLI
@@ -211,7 +225,9 @@ File management on Google Drive via OAuth2: list, upload, download, share, searc
 Wraps the `gh` CLI for repos, issues, PRs, workflows, releases, gists, and raw API calls.
 
 **Tools:** `gh_repo_view`, `gh_repo_clone`, `gh_repo_create`, `gh_repo_fork`, `gh_repo_list`, `gh_issue_list`, `gh_issue_view`, `gh_issue_create`, `gh_issue_close`, `gh_issue_reopen`, `gh_pr_list`, `gh_pr_view`, `gh_pr_create`, `gh_pr_checkout`, `gh_pr_merge`, `gh_pr_close`, `gh_pr_review`, `gh_pr_diff`, `gh_run_list`, `gh_run_view`, `gh_run_rerun`, `gh_workflow_list`, `gh_workflow_run`, `gh_release_list`, `gh_release_view`, `gh_release_create`, `gh_release_download`, `gh_gist_list`, `gh_gist_view`, `gh_gist_create`, `gh_auth_status`, `gh_auth_login`, `gh_search_repos`, `gh_search_issues`, `gh_api`
+
 **Config:** Requires `gh` in PATH and `gh auth login`. Optional `HUNTER3_GH_ALLOWED_PATHS` for path restriction.
+
 **Details:** [cmd/mcp-gh/README.md](cmd/mcp-gh/README.md)
 
 ### mcp-git -- Git
@@ -219,6 +235,7 @@ Wraps the `gh` CLI for repos, issues, PRs, workflows, releases, gists, and raw A
 Wraps the `git` CLI with 25+ commands. Sanitizes dangerous flags and restricts paths.
 
 **Tools:** `git_status`, `git_log`, `git_diff`, `git_show`, `git_blame`, `git_add`, `git_commit`, `git_reset`, `git_restore`, `git_rm`, `git_mv`, `git_branch`, `git_checkout`, `git_switch`, `git_merge`, `git_rebase`, `git_cherry_pick`, `git_remote`, `git_fetch`, `git_pull`, `git_push`, `git_clone`, `git_tag`, `git_stash`, `git_clean`, `git_init`, `git_rev_parse`, `git_ls_files`
+
 **Config:** Optional `HUNTER3_GIT_ALLOWED_PATHS` (defaults to `$HOME`)
 
 ### mcp-gmail -- Gmail
@@ -226,7 +243,9 @@ Wraps the `git` CLI with 25+ commands. Sanitizes dangerous flags and restricts p
 Gmail integration via OAuth2: read, send (with attachments), and search emails.
 
 **Tools:** `list_messages`, `read_message`, `send_message`, `search_messages`
+
 **Config:** OAuth2 credentials at `~/.hunter3/gmail-credentials.json` (or `GMAIL_CREDENTIALS_FILE`)
+
 **Details:** [cmd/mcp-gmail/README.md](cmd/mcp-gmail/README.md)
 
 ### mcp-imail -- iCloud Mail
@@ -234,7 +253,9 @@ Gmail integration via OAuth2: read, send (with attachments), and search emails.
 iCloud Mail via IMAP/SMTP. Simpler setup than Gmail (no OAuth -- uses App-Specific Passwords).
 
 **Tools:** `list_messages`, `read_message`, `send_message`, `search_messages`, `list_mailboxes`
+
 **Config:** `ICLOUD_EMAIL`/`ICLOUD_PASSWORD` env vars or `~/.hunter3/icloud-mail.json`
+
 **Details:** [cmd/mcp-imail/README.md](cmd/mcp-imail/README.md)
 
 ### mcp-make -- Build Tool
@@ -242,6 +263,7 @@ iCloud Mail via IMAP/SMTP. Simpler setup than Gmail (no OAuth -- uses App-Specif
 Runs `make` targets in the project directory.
 
 **Tools:** `build`
+
 **Config:** Optional `HUNTER3_PROJECT_ROOT` (auto-detects by looking for Makefile)
 
 ### mcp-openclaw-skills -- OpenClaw Skills
@@ -249,7 +271,9 @@ Runs `make` targets in the project directory.
 Read and search OpenClaw SKILL.md files. Also exposes skills as MCP resources (`openclaw://skill/{name}`).
 
 **Tools:** `list_skills`, `get_skill`, `search_skills`
+
 **Config:** Optional `OPENCLAW_SKILLS_PATH` (defaults to `~/.openclaw/skills`)
+
 **Details:** [cmd/mcp-openclaw-skills/README.md](cmd/mcp-openclaw-skills/README.md)
 
 ### mcp-weather -- NOAA Weather
@@ -257,6 +281,7 @@ Read and search OpenClaw SKILL.md files. Also exposes skills as MCP resources (`
 US weather data from the National Weather Service API.
 
 **Tools:** `get_forecast`, `get_alerts`, `get_observation`
+
 **Config:** None (uses public NWS API)
 
 ## Environment Variables
