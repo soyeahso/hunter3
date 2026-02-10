@@ -1,4 +1,5 @@
-These instructions work best on Debian 12.12.
+These instructions have been tested on Amazon Lightsail with Debian 12.12
+Any VPS / Cloud provider with Debian available should do just fine.
 
 Prerequisites:
 * A secure IRC server with TLS and server password enabled
