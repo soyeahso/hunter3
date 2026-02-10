@@ -6,6 +6,7 @@ Prerequisites:
 * A secure IRC server with TLS and server password enabled
 * A Debian VPS or Linux container on a secure host
 * A fresh github account specifically for this purpose
+* A fresh email account if you want to test the gmail / imail MCP servers
 
 1. sudo apt-get update -y && sudo apt-get upgrade -y && sudo apt-get install git gh make -y
 2. sudo reboot
@@ -42,10 +43,11 @@ git clone https://github.com/soyeahso/golang-tools-install-script && cd golang-t
         }
 ```
 
-17. run 'make claude' and type /mcp, press enter, and observe that everything is connected
-18. try running hunter3 using 'make run' and then hit ctrl-c once you're stuck at hooks emitted
-19. copy config.yaml to ~/.hunter3/ and edit it to point at your irc server
-20. rerun 'make run', you should now be connected
+17. configure an API key for brave, put it into .env as export BRAVE_API_KEY=your_api_key, and run source .env
+18. run 'make claude' and type /mcp, press enter, and observe that everything is connected
+19. try running hunter3 using 'make run' and then hit ctrl-c once you're stuck at hooks emitted
+20. copy config.yaml to ~/.hunter3/ and edit it to point at your irc server
+21. rerun 'make run', you should now be connected
 
 
 

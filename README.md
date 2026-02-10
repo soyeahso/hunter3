@@ -4,8 +4,15 @@ A personal AI assistant that bridges messaging channels with LLM providers and
 external tools. It manages conversations and sessions through a configurable
 WebSocket-based gateway.
 
+hunter3 is able to be self-modifying and reprogrammable on the fly. Simply
+prompt it with the changes you want, it will modify and rebuild itself,
+automatically reconnecting to the IRC server. If you break it, just drop down
+into your terminal and fix it using Claude or any number of other CLI tools.
+
 If you require communication methods other than IRC, consider installing and
-configuring bitlbee. Otherwise, just use IRC.
+configuring bitlbee. Otherwise, just use IRC. It's simple and well-understood.
+There are dozens of trustworthy, open source IRC clients that are known to be
+secure and not leak your data.
 
 ## Architecture
 
