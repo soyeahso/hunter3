@@ -81,7 +81,7 @@ hunter3 version      # Show version info
 
 Configuration is stored in `~/.hunter3/config.yaml`. 
 
-The database lives at `~/.hunter3/hunter3.db`.
+The database lives at `~/.hunter3/data/hunter3.db`.
 
 ```yaml
 gateway:
