@@ -1,0 +1,10 @@
+# Credentials and tokens
+gmail-credentials.json
+gmail-token.json
+*.json
+
+# Binary
+mcp-gmail
+
+# Logs
+*.log

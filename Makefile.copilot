@@ -1,0 +1,81 @@
+# Makefile.copilot — GitHub Copilot CLI targets
+# Usage: make -f Makefile.copilot <target>
+
+include Makefile
+
+BUILD_DIR := dist
+MCP_CONFIG := ~/.copilot/mcp.json
+
+# Launch Copilot CLI interactively
+copilot:
+	copilot
+
+# Launch Copilot CLI with all permissions enabled
+copilot-yolo:
+	copilot --allow-all
+
+# Generate MCP config JSON for Copilot CLI
+# Copilot uses --additional-mcp-config instead of per-tool registration
+mcp-config:
+	@mkdir -p $(BUILD_DIR)
+	go build -o $(BUILD_DIR)/mcp-fetch-website ./cmd/mcp-fetch-website
+	go build -o $(BUILD_DIR)/mcp-make ./cmd/mcp-make
+	go build -o $(BUILD_DIR)/mcp-git ./cmd/mcp-git
+	go build -o $(BUILD_DIR)/mcp-weather ./cmd/mcp-weather
+	go build -o $(BUILD_DIR)/mcp-filesystem ./cmd/mcp-filesystem
+	go build -o $(BUILD_DIR)/mcp-docker ./cmd/mcp-docker
+	go build -o $(BUILD_DIR)/mcp-brave ./cmd/mcp-brave
+	go build -o $(BUILD_DIR)/mcp-gdrive ./cmd/mcp-gdrive
+	go build -o $(BUILD_DIR)/mcp-gmail ./cmd/mcp-gmail
+	@echo '{'                                                                          > $(BUILD_DIR)/mcp-servers.json
+	@echo '  "mcpServers": {'                                                         >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    "mcp-fetch-website": {'                                                >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "command": "'$(shell readlink -f $(BUILD_DIR)/mcp-fetch-website)'",' >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "args": []'                                                          >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    },'                                                                    >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    "mcp-make": {'                                                         >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "command": "'$(shell readlink -f $(BUILD_DIR)/mcp-make)'",'          >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "args": []'                                                          >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    },'                                                                    >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    "mcp-git": {'                                                          >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "command": "'$(shell readlink -f $(BUILD_DIR)/mcp-git)'",'           >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "args": []'                                                          >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    },'                                                                    >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    "mcp-weather": {'                                                      >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "command": "'$(shell readlink -f $(BUILD_DIR)/mcp-weather)'",'       >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "args": []'                                                          >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    },'                                                                    >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    "mcp-filesystem": {'                                                   >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "command": "'$(shell readlink -f $(BUILD_DIR)/mcp-filesystem)'",'    >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "args": ["/home/genoeg/sandbox"]'                                   >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    },'                                                                    >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    "mcp-brave": {'                                                        >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "command": "'$(shell readlink -f $(BUILD_DIR)/mcp-brave)'",'         >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "args": ["/home/genoeg/sandbox"]'                                   >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    },'                                                                    >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    "mcp-docker": {'                                                       >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "command": "'$(shell readlink -f $(BUILD_DIR)/mcp-docker)'",'        >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "args": []'                                                          >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    },'                                                                    >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    "mcp-gdrive": {'                                                       >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "command": "'$(shell readlink -f $(BUILD_DIR)/mcp-gdrive)'",'        >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "args": []'                                                          >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    },'                                                                    >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    "mcp-gmail": {'                                                        >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "command": "'$(shell readlink -f $(BUILD_DIR)/mcp-gmail)'",'         >> $(BUILD_DIR)/mcp-servers.json
+	@echo '      "args": []'                                                          >> $(BUILD_DIR)/mcp-servers.json
+	@echo '    }'                                                                     >> $(BUILD_DIR)/mcp-servers.json
+	@echo '  }'                                                                       >> $(BUILD_DIR)/mcp-servers.json
+	@echo '}'                                                                         >> $(BUILD_DIR)/mcp-servers.json
+	@echo "MCP server config written to $(BUILD_DIR)/mcp-servers.json"
+	@echo "Use with: copilot --additional-mcp-config @$(shell readlink -f $(BUILD_DIR)/mcp-servers.json)"
+
+# Launch Copilot CLI with MCP servers loaded
+copilot-mcp: mcp-config
+	copilot --additional-mcp-config @$(shell readlink -f $(BUILD_DIR)/mcp-servers.json)
+
+# Install MCP config to Copilot's config directory
+mcp-install: mcp-config
+	@mkdir -p $(dir $(MCP_CONFIG))
+	cp $(BUILD_DIR)/mcp-servers.json $(MCP_CONFIG)
+	@echo "MCP config installed to $(MCP_CONFIG)"

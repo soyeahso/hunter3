@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "openclaw-skills": {
+      "command": "dist/mcp-openclaw-skills",
+      "args": [],
+      "env": {
+        "OPENCLAW_SKILLS_PATH": "~/path/to/openclaw/skills"
+      }
+    }
+  }
+}

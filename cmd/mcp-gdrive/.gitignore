@@ -1,0 +1,7 @@
+# OAuth credentials and tokens (never commit these!)
+gdrive-credentials.json
+gdrive-token.json
+
+# Local test files
+*.local
+test_*

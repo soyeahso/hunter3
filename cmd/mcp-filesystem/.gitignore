@@ -1,0 +1,22 @@
+# Binaries
+mcp-filesystem
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+.vscode/
+
+# Logs
+*.log

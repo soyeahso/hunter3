@@ -1,0 +1,34 @@
+cli: claude              # "claude" | "copilot" — selects the primary CLI provider
+
+gateway:
+  port: 18789
+  bind: loopback
+  auth:
+    mode: token
+
+logging:
+  level: debug
+  consoleLevel: debug
+  consoleStyle: pretty
+
+channels:
+  irc:
+    server: irc.libera.chat
+    port: 6667
+    nick: hunter3
+    channels:
+      - "#hunter3"
+    useTLS: false
+    opOnly: true         # Only respond to channel operators (default: true)
+    # owner: soyeahso   # Only accept messages from this nick (default: "soyeahso", set "" to disable)
+    # password: ""       # Server password (sent via PASS command)
+    # sasl: false        # Enable SASL PLAIN authentication (uses nick + password)
+    stream: true
+
+agents:
+  defaults:
+    model: sonnet
+
+session:
+  scope: per-sender
+  store: sqlite

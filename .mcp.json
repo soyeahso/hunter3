@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "/home/genoeg/go/src/github.com/soyeahso/hunter3/dist/mcp-filesystem",
+      "args": [
+        "/home/genoeg/sandbox",
+	"/home/genoeg/go/src/github.com/soyeahso/hunter3"
+      ]
+    },
+    "fetch": {
+      "command": "/home/genoeg/go/src/github.com/soyeahso/hunter3/dist/mcp-fetch-website",
+      "args": []
+    },
+    "rebuild": {
+      "command": "/home/genoeg/go/src/github.com/soyeahso/hunter3/dist/mcp-rebuild",
+      "args": []
+    },
+    "weather": {
+      "command": "/home/genoeg/go/src/github.com/soyeahso/hunter3/dist/mcp-weather",
+      "args": []
+    }
+  }
+}

@@ -1,0 +1,13 @@
+# Binaries
+mcp-fetch-website
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
