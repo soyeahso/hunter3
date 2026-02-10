@@ -62,6 +62,7 @@ func NewClaudeClient(log *logging.Logger) *CLIClient {
 		BuildArgs:       buildClaudeArgs,
 		ParseResponse:   parseClaudeResponse,
 		ParseStreamLine: parseClaudeStreamLine,
+		PromptViaStdin:  true,
 	}, log)
 }
 
@@ -74,6 +75,7 @@ func NewClaudeClientWithCommand(command string, log *logging.Logger) *CLIClient 
 		BuildArgs:       buildClaudeArgs,
 		ParseResponse:   parseClaudeResponse,
 		ParseStreamLine: parseClaudeStreamLine,
+		PromptViaStdin:  true,
 	}, log)
 }
 

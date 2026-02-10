@@ -10,9 +10,9 @@ MCP_CONFIG := ~/.copilot/mcp.json
 copilot:
 	copilot
 
-# Launch Copilot CLI with all permissions enabled
+# Launch Copilot CLI with all permissions enabled and MCP servers
 copilot-yolo:
-	copilot --allow-all
+	copilot --allow-all --additional-mcp-config @$(shell readlink -f $(HOME)/.hunter3/mcp-servers.json)
 
 # Generate MCP config JSON for Copilot CLI
 # Copilot uses --additional-mcp-config instead of per-tool registration
@@ -67,12 +67,13 @@ mcp-config:
 	@echo '    }'                                                                     >> $(BUILD_DIR)/mcp-servers.json
 	@echo '  }'                                                                       >> $(BUILD_DIR)/mcp-servers.json
 	@echo '}'                                                                         >> $(BUILD_DIR)/mcp-servers.json
-	@echo "MCP server config written to $(BUILD_DIR)/mcp-servers.json"
-	@echo "Use with: copilot --additional-mcp-config @$(shell readlink -f $(BUILD_DIR)/mcp-servers.json)"
+	@mv $(BUILD_DIR)/mcp-servers.json $(HOME)/.hunter3/mcp-servers.json
+	@echo "MCP server config written to $(HOME)/.hunter3/mcp-servers.json"
+	@echo "Use with: copilot --additional-mcp-config @$(shell readlink -f $(HOME)/.hunter3/mcp-servers.json)"
 
 # Launch Copilot CLI with MCP servers loaded
 copilot-mcp: mcp-config
-	copilot --additional-mcp-config @$(shell readlink -f $(BUILD_DIR)/mcp-servers.json)
+	copilot --additional-mcp-config @$(shell readlink -f $(HOME)/.hunter3/mcp-servers.json)
 
 # Install MCP config to Copilot's config directory
 mcp-install: mcp-config

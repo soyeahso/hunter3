@@ -27,7 +27,8 @@ channels:
 
 agents:
   defaults:
-    model: sonnet
+    #model: sonnet       # claude expects sonnet, copilot expects claude-sonnet-4.5
+    #model: sonnet
 
 session:
   scope: per-sender

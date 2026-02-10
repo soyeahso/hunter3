@@ -2,6 +2,8 @@ package llm
 
 import (
 	"bytes"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/soyeahso/hunter3/internal/logging"
@@ -40,9 +42,17 @@ func buildCopilotArgs(req CompletionRequest) []string {
 	}
 
 	// -p / --prompt for non-interactive mode; --allow-all to skip permission prompts.
-	args := []string{"-p", prompt, "--allow-all"}
+	args := []string{
+		"-p", prompt,
+		"--allow-all",
+	}
 
-	if req.Model != "" {
+	// Add MCP server config if the file exists.
+	if mcpPath := copilotMCPConfigPath(); mcpPath != "" {
+		args = append(args, "--additional-mcp-config", "@"+mcpPath)
+	}
+
+	if req.Model != "" && req.Model != "copilot" {
 		args = append(args, "--model", req.Model)
 	}
 
@@ -72,4 +82,24 @@ func parseCopilotStreamLine(data []byte) (*StreamEvent, error) {
 		Type:    "delta",
 		Content: string(line) + "\n",
 	}, nil
+}
+
+// copilotMCPConfigPath returns the path to the MCP server config file,
+// or "" if no config file is found. It checks ~/.hunter3/mcp-servers.json
+// first, then falls back to ~/.copilot/mcp-config.json.
+func copilotMCPConfigPath() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	candidates := []string{
+		filepath.Join(home, ".hunter3", "mcp-servers.json"),
+		filepath.Join(home, ".copilot", "mcp-config.json"),
+	}
+	for _, p := range candidates {
+		if _, err := os.Stat(p); err == nil {
+			return p
+		}
+	}
+	return ""
 }

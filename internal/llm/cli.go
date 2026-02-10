@@ -2,6 +2,7 @@ package llm
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -30,6 +31,11 @@ type CLIConfig struct {
 
 	// ProviderName is the display name for this provider.
 	ProviderName string
+
+	// PromptViaStdin pipes the last user message to the CLI's stdin.
+	// Set to true for CLIs that read their prompt from stdin (e.g., claude -p).
+	// Set to false for CLIs that take the prompt as a flag argument (e.g., copilot -p "msg").
+	PromptViaStdin bool
 }
 
 // CLIClient wraps any CLI tool as an LLM provider.
@@ -59,10 +65,12 @@ func (c *CLIClient) Complete(ctx context.Context, req CompletionRequest) (*Compl
 	start := time.Now()
 
 	cmd := exec.CommandContext(ctx, c.cfg.Command, args...)
-	if req.Messages != nil && len(req.Messages) > 0 {
-		last := req.Messages[len(req.Messages)-1]
-		if last.Role == RoleUser {
-			cmd.Stdin = strings.NewReader(last.Content)
+	if c.cfg.PromptViaStdin {
+		if req.Messages != nil && len(req.Messages) > 0 {
+			last := req.Messages[len(req.Messages)-1]
+			if last.Role == RoleUser {
+				cmd.Stdin = strings.NewReader(last.Content)
+			}
 		}
 	}
 
@@ -97,10 +105,12 @@ func (c *CLIClient) Stream(ctx context.Context, req CompletionRequest) (<-chan S
 	args := c.cfg.BuildArgs(req)
 
 	cmd := exec.CommandContext(ctx, c.cfg.Command, args...)
-	if req.Messages != nil && len(req.Messages) > 0 {
-		last := req.Messages[len(req.Messages)-1]
-		if last.Role == RoleUser {
-			cmd.Stdin = strings.NewReader(last.Content)
+	if c.cfg.PromptViaStdin {
+		if req.Messages != nil && len(req.Messages) > 0 {
+			last := req.Messages[len(req.Messages)-1]
+			if last.Role == RoleUser {
+				cmd.Stdin = strings.NewReader(last.Content)
+			}
 		}
 	}
 
@@ -108,6 +118,10 @@ func (c *CLIClient) Stream(ctx context.Context, req CompletionRequest) (<-chan S
 	if err != nil {
 		return nil, fmt.Errorf("stdout pipe: %w", err)
 	}
+
+	// Capture stderr so we can report CLI errors that would otherwise be lost.
+	var stderrBuf bytes.Buffer
+	cmd.Stderr = &stderrBuf
 
 	if err := cmd.Start(); err != nil {
 		return nil, fmt.Errorf("starting %s: %w", c.cfg.Command, err)
@@ -117,9 +131,25 @@ func (c *CLIClient) Stream(ctx context.Context, req CompletionRequest) (<-chan S
 
 	go func() {
 		defer close(ch)
-		defer cmd.Wait()
 
 		c.streamOutput(stdout, ch)
+
+		// Wait for the process to exit and check for errors.
+		if err := cmd.Wait(); err != nil {
+			stderr := strings.TrimSpace(stderrBuf.String())
+			if stderr == "" {
+				stderr = err.Error()
+			}
+			c.log.Error().
+				Str("cmd", c.cfg.Command).
+				Str("stderr", stderr).
+				Err(err).
+				Msg("CLI process failed")
+			ch <- StreamEvent{
+				Type:  "error",
+				Error: fmt.Sprintf("%s: %s", c.cfg.Command, stderr),
+			}
+		}
 	}()
 
 	return ch, nil
