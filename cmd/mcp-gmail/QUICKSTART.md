@@ -60,7 +60,7 @@ make build
 # Option B: Manual build
 cd /home/genoeg/go/src/github.com/soyeahso/hunter3
 go mod tidy
-go build -o bin/mcp-gmail ./cmd/mcp-gmail
+go build -o dist/mcp-gmail ./cmd/mcp-gmail
 ```
 
 ## Step 4: First Run & Authentication
@@ -77,7 +77,7 @@ The `--auth` flag runs an interactive OAuth flow. Follow these steps:
 2. **Open it in your browser**
 3. **Sign in** to your Google account
 4. **Allow access** (you may see a warning - click "Advanced" then "Go to Hunter3 MCP Gmail")
-5. **Copy the authorization code**
+5. **Copy the authorization code** (if redirected to localhost, copy the code from code=(your_code) up to the ampersand.
 6. **Paste it** back into the terminal
 
 The token will be saved to `~/.hunter3/gmail-token.json` for future use.
@@ -88,13 +88,13 @@ The token will be saved to `~/.hunter3/gmail-token.json` for future use.
 
 ```bash
 # Initialize
-echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | ./bin/mcp-gmail
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | ./dist/mcp-gmail
 
 # List tools
-echo '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | ./bin/mcp-gmail
+echo '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | ./dist/mcp-gmail
 
 # List unread messages
-echo '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"list_messages","arguments":{"query":"is:unread","max_results":"5"}}}' | ./bin/mcp-gmail
+echo '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"list_messages","arguments":{"query":"is:unread","max_results":"5"}}}' | ./dist/mcp-gmail
 ```
 
 ### Interactive test:
@@ -103,7 +103,7 @@ Create a test script `test.sh`:
 
 ```bash
 #!/bin/bash
-./bin/mcp-gmail << 'EOF'
+./dist/mcp-gmail << 'EOF'
 {"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}
 {"jsonrpc":"2.0","id":2,"method":"tools/list"}
 {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"list_messages","arguments":{"query":"is:unread","max_results":"3"}}}
@@ -148,7 +148,7 @@ ls -la ~/.hunter3/gmail-credentials.json
 
 ```bash
 rm ~/.hunter3/gmail-token.json
-./bin/mcp-gmail --auth
+./dist/mcp-gmail --auth
 ```
 
 ## Next Steps
