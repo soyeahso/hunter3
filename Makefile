@@ -128,7 +128,6 @@ mcp-register: mcp-all
 	@claude mcp add --transport stdio mcp-gdrive -- $(shell readlink -f $(BUILD_DIR)/mcp-gdrive) || true
 	@claude mcp add --transport stdio mcp-gmail -- $(shell readlink -f $(BUILD_DIR)/mcp-gmail) || true
 	@claude mcp add --transport stdio mcp-imail -- $(shell readlink -f $(BUILD_DIR)/mcp-imail) || true
-
 	@claude mcp add --transport stdio mcp-curl -- $(shell readlink -f $(BUILD_DIR)/mcp-curl) || true
 	@echo "All MCP plugins registered."
 
