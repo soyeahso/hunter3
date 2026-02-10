@@ -66,12 +66,12 @@ go build -o bin/mcp-gmail ./cmd/mcp-gmail
 ## Step 4: First Run & Authentication
 
 ```bash
-# Run the plugin
+# Authenticate (one-time setup)
 cd /home/genoeg/go/src/github.com/soyeahso/hunter3
-./bin/mcp-gmail
+./bin/mcp-gmail --auth
 ```
 
-The plugin will prompt you with a URL. Follow these steps:
+The `--auth` flag runs an interactive OAuth flow. Follow these steps:
 
 1. **Copy the URL** from the terminal
 2. **Open it in your browser**
@@ -128,6 +128,15 @@ ls -la ~/.hunter3/gmail-credentials.json
 ### "This app isn't verified" warning
 **Solution:** This is expected for development apps. Click "Advanced" → "Go to Hunter3 MCP Gmail (unsafe)" → "Allow"
 
+### "Access blocked: ... can only be used within its organization"
+**Solution:** Your OAuth consent screen is set to **Internal** instead of **External**.
+1. Go to **APIs & Services > OAuth consent screen** in Google Cloud Console
+2. Under **User type**, click **Make External** (or delete and recreate with **External** selected)
+3. Add your email as a **test user**
+4. Try authenticating again: `./bin/mcp-gmail --auth`
+
+> **Note:** If you're using a personal Gmail account (not Google Workspace), you **must** select External.
+
 ### "Access blocked: Authorization Error"
 **Solution:** Make sure you:
 1. Added your email as a test user in OAuth consent screen
@@ -139,7 +148,7 @@ ls -la ~/.hunter3/gmail-credentials.json
 
 ```bash
 rm ~/.hunter3/gmail-token.json
-./bin/mcp-gmail
+./bin/mcp-gmail --auth
 ```
 
 ## Next Steps

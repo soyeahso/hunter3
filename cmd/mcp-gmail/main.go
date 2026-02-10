@@ -122,9 +122,57 @@ func initLogger() {
 func main() {
 	initLogger()
 
+	// Check for --auth flag for interactive OAuth flow
+	for _, arg := range os.Args[1:] {
+		if arg == "--auth" {
+			runAuth()
+			return
+		}
+	}
+
 	server := &MCPServer{}
 	logger.Println("Server initialized")
 	server.Run()
+}
+
+func runAuth() {
+	credentialsPath := os.Getenv("GMAIL_CREDENTIALS_FILE")
+	if credentialsPath == "" {
+		credentialsPath = filepath.Join(os.Getenv("HOME"), ".hunter3", "gmail-credentials.json")
+	}
+
+	b, err := os.ReadFile(credentialsPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to read credentials file at %s: %v\n", credentialsPath, err)
+		fmt.Fprintf(os.Stderr, "See QUICKSTART.md Step 1-2 for setup instructions.\n")
+		os.Exit(1)
+	}
+
+	config, err := google.ConfigFromJSON(b, gmail.GmailReadonlyScope, gmail.GmailSendScope, gmail.GmailComposeScope, gmail.GmailModifyScope)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to parse credentials: %v\n", err)
+		os.Exit(1)
+	}
+
+	tokenPath := filepath.Join(os.Getenv("HOME"), ".hunter3", "gmail-token.json")
+
+	// Check if token already exists
+	if _, err := tokenFromFile(tokenPath); err == nil {
+		fmt.Println("Already authenticated. Token exists at", tokenPath)
+		fmt.Println("To re-authenticate, delete the token first:")
+		fmt.Println("  rm", tokenPath)
+		return
+	}
+
+	token, err := getTokenFromWeb(config)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Authentication failed: %v\n", err)
+		os.Exit(1)
+	}
+
+	saveToken(tokenPath, token)
+	fmt.Println("\nAuthentication successful! Token saved to", tokenPath)
+	fmt.Println("You can now use mcp-gmail as an MCP server.")
 }
 
 type MCPServer struct {
@@ -227,11 +275,7 @@ func (s *MCPServer) initGmailService() error {
 	tokenPath := filepath.Join(os.Getenv("HOME"), ".hunter3", "gmail-token.json")
 	token, err := tokenFromFile(tokenPath)
 	if err != nil {
-		token, err = getTokenFromWeb(config)
-		if err != nil {
-			return fmt.Errorf("unable to get token from web: %w", err)
-		}
-		saveToken(tokenPath, token)
+		return fmt.Errorf("no auth token found at %s - run 'mcp-gmail --auth' to authenticate first", tokenPath)
 	}
 
 	client := config.Client(ctx, token)
