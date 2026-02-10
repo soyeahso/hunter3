@@ -18,6 +18,10 @@
     "weather": {
       "command": "/home/genoeg/go/src/github.com/soyeahso/hunter3/dist/mcp-weather",
       "args": []
+    },
+    "mcp-gdrive": {
+      "command": "/home/genoeg/go/src/github.com/soyeahso/hunter3/dist/mcp-gdrive",
+      "args": []
     }
   }
 }
