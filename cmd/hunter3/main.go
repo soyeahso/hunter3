@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/tillberg/autorestart"
@@ -11,6 +12,7 @@ func main() {
 	go autorestart.RestartOnChange()
 
 	if err := cli.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"regexp"
 	"strconv"
@@ -39,15 +40,14 @@ func expandSensitiveFields(cfg *Config) {
 }
 
 // Load reads the config file, applies environment overrides, and returns
-// a merged Config. Missing files produce defaults only.
+// a merged Config. Returns an error if the file is missing or unreadable.
 func Load(path string) (Config, error) {
 	cfg := Defaults()
 
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			applyEnvOverrides(&cfg)
-			return cfg, nil
+			return cfg, &ConfigError{Message: fmt.Sprintf("config file not found: %s", path)}
 		}
 		return cfg, err
 	}
@@ -66,9 +66,6 @@ func Load(path string) (Config, error) {
 func LoadRaw(path string) (map[string]any, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return map[string]any{}, nil
-		}
 		return nil, err
 	}
 

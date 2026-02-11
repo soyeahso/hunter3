@@ -309,12 +309,14 @@ func (s *Server) Start(ctx context.Context) error {
 		Msg("gateway server starting")
 
 	if s.hooks != nil {
-		s.log.Info().Msg("hooks emit")
 		s.hooks.Emit(ctx, hooks.EventGatewayStart, map[string]any{
 			"addr": ln.Addr().String(),
 		})
-		s.log.Info().Msg("hooks emitted")
 	}
+
+	s.log.Info().
+		Str("addr", ln.Addr().String()).
+		Msg("gateway server ready")
 
 	// Shutdown when context is cancelled
 	go func() {

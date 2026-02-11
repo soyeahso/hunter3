@@ -23,11 +23,9 @@ func TestDefaults(t *testing.T) {
 }
 
 func TestLoadMissingFile(t *testing.T) {
-	cfg, err := Load("/nonexistent/path/config.yaml")
-	require.NoError(t, err)
-	// Should return defaults
-	assert.Equal(t, 18789, cfg.Gateway.Port)
-	assert.Equal(t, "info", cfg.Logging.Level)
+	_, err := Load("/nonexistent/path/config.yaml")
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "config file not found")
 }
 
 func TestLoadValidYAML(t *testing.T) {
@@ -92,10 +90,14 @@ func TestLoadInvalidYAML(t *testing.T) {
 }
 
 func TestLoadEnvOverrides(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "config.yaml")
+	require.NoError(t, os.WriteFile(path, []byte("{}"), 0o600))
+
 	t.Setenv("HUNTER3_GATEWAY_PORT", "12345")
 	t.Setenv("HUNTER3_LOG_LEVEL", "TRACE")
 
-	cfg, err := Load("/nonexistent/config.yaml")
+	cfg, err := Load(path)
 	require.NoError(t, err)
 
 	assert.Equal(t, 12345, cfg.Gateway.Port)
