@@ -10,9 +10,9 @@ automatically reconnecting to the IRC server. If you break it, just drop down
 into your terminal and fix it using Claude or any number of other CLI tools.
 
 If you require communication methods other than IRC, consider installing and
-configuring bitlbee. Otherwise, just use IRC. It's simple and well-understood.
-There are dozens of trustworthy, open source IRC clients that are known to be
-secure and not leak your data.
+configuring a bridge. Otherwise, just use IRC. It's simple and well-understood.
+There are dozens of trustworthy, open source IRC clients and servers that are
+known to be secure and not leak your data.
 
 ## Architecture
 
