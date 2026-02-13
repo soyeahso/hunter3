@@ -15,7 +15,7 @@ LDFLAGS := -X github.com/soyeahso/hunter3/internal/version.Version=$(VERSION) \
            -X github.com/soyeahso/hunter3/internal/version.Date=$(DATE)
 
 .PHONY: all build test vet lint clean mcp-all mcp-register \
-       mcp-fetch-website mcp-make mcp-git mcp-gh mcp-weather mcp-filesystem mcp-brave mcp-docker mcp-gdrive mcp-gmail mcp-imail mcp-digitalocean mcp-curl
+       mcp-fetch-website mcp-make mcp-git mcp-gh mcp-weather mcp-filesystem mcp-brave mcp-docker mcp-gdrive mcp-gmail mcp-imail mcp-digitalocean mcp-curl mcp-ssh
 
 # Build all binaries from cmd/ into dist/
 all:
@@ -32,7 +32,7 @@ all:
 	go build -o $(BUILD_DIR)/mcp-gdrive ./cmd/mcp-gdrive
 	go build -o $(BUILD_DIR)/mcp-gmail ./cmd/mcp-gmail
 	go build -o $(BUILD_DIR)/mcp-imail ./cmd/mcp-imail
-
+	go build -o $(BUILD_DIR)/mcp-ssh ./cmd/mcp-ssh
 	go build -o $(BUILD_DIR)/mcp-curl ./cmd/mcp-curl
 	@echo "All binaries built in $(BUILD_DIR):"
 	@ls -lh $(BUILD_DIR)/
@@ -109,8 +109,11 @@ mcp-auditor:
 mcp-curl:
 	go build -o $(BUILD_DIR)/mcp-curl ./cmd/mcp-curl
 
+mcp-ssh:
+	go build -o $(BUILD_DIR)/mcp-ssh ./cmd/mcp-ssh
+
 # Build all MCP plugins
-mcp-all: mcp-fetch-website mcp-make mcp-git mcp-gh mcp-weather mcp-filesystem mcp-brave mcp-docker mcp-digitalocean mcp-gdrive mcp-gmail mcp-imail mcp-curl
+mcp-all: mcp-fetch-website mcp-make mcp-git mcp-gh mcp-weather mcp-filesystem mcp-brave mcp-docker mcp-digitalocean mcp-gdrive mcp-gmail mcp-imail mcp-curl mcp-ssh
 	@echo "All MCP plugins built in $(BUILD_DIR)/"
 
 # Register all MCP plugins with claude CLI (run once, or when adding new plugins)
@@ -128,6 +131,7 @@ mcp-register: mcp-all
 	@claude mcp add --transport stdio mcp-gdrive -- $(shell readlink -f $(BUILD_DIR)/mcp-gdrive) || true
 	@claude mcp add --transport stdio mcp-gmail -- $(shell readlink -f $(BUILD_DIR)/mcp-gmail) || true
 	@claude mcp add --transport stdio mcp-imail -- $(shell readlink -f $(BUILD_DIR)/mcp-imail) || true
+	@claude mcp add --transport stdio mcp-ssh -- $(shell readlink -f $(BUILD_DIR)/mcp-ssh) || true
 	@claude mcp add --transport stdio mcp-curl -- $(shell readlink -f $(BUILD_DIR)/mcp-curl) || true
 	@echo "All MCP plugins registered."
 

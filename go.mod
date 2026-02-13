@@ -12,6 +12,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
 	github.com/tillberg/autorestart v0.0.0-20220524165049-22c3f5bc7fce
+	golang.org/x/crypto v0.47.0
 	golang.org/x/oauth2 v0.35.0
 	google.golang.org/api v0.265.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -49,7 +50,6 @@ require (
 	go.opentelemetry.io/otel v1.39.0 // indirect
 	go.opentelemetry.io/otel/metric v1.39.0 // indirect
 	go.opentelemetry.io/otel/trace v1.39.0 // indirect
-	golang.org/x/crypto v0.47.0 // indirect
 	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546 // indirect
 	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
