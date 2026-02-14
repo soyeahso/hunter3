@@ -1,0 +1,4 @@
+# Populate this manually, or let Terraform generate it via:
+#   cd ../terraform && terraform apply
+[hunter3]
+# <INSTANCE_IP> ansible_user=admin ansible_ssh_private_key_file=~/.ssh/id_ed25519

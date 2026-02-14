@@ -1,0 +1,6 @@
+aws_region           = "us-east-1"
+instance_name        = "hunter3"
+blueprint_id         = "debian_12"
+bundle_id            = "small_3_0"    # 2 GB RAM, 1 vCPU, 60 GB SSD
+ssh_public_key_path  = "~/.ssh/id_rsa.pub"
+ssh_private_key_path = "~/.ssh/id_rsa"

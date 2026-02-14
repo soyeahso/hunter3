@@ -8,6 +8,8 @@ export GOFLAGS
 BINARY := hunter3
 BUILD_DIR := dist
 VERSION ?= dev
+DOCKER_IMAGE := soyeahso/hunter3
+DOCKER_TAG ?= $(VERSION)
 COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 DATE := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 LDFLAGS := -X github.com/soyeahso/hunter3/internal/version.Version=$(VERSION) \
@@ -15,7 +17,8 @@ LDFLAGS := -X github.com/soyeahso/hunter3/internal/version.Version=$(VERSION) \
            -X github.com/soyeahso/hunter3/internal/version.Date=$(DATE)
 
 .PHONY: all build test vet lint clean mcp-all mcp-register \
-       mcp-fetch-website mcp-make mcp-git mcp-gh mcp-weather mcp-filesystem mcp-brave mcp-docker mcp-gdrive mcp-gmail mcp-imail mcp-digitalocean mcp-curl mcp-ssh
+       mcp-fetch-website mcp-make mcp-git mcp-gh mcp-weather mcp-filesystem mcp-brave mcp-docker mcp-gdrive mcp-gmail mcp-imail mcp-digitalocean mcp-curl mcp-ssh \
+       docker-login docker-build docker-push
 
 # Build all binaries from cmd/ into dist/
 all:
@@ -163,3 +166,23 @@ vendor:
 	go mod vendor
 	go mod tidy
 
+# Docker targets
+docker-login:
+	docker login
+
+docker-build:
+	docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+	@if [ "$(DOCKER_TAG)" != "latest" ]; then docker tag $(DOCKER_IMAGE):$(DOCKER_TAG) $(DOCKER_IMAGE):latest; fi
+	@echo "Built $(DOCKER_IMAGE):$(DOCKER_TAG)"
+
+# make docker-push VERSION=1.0.0.
+docker-push: docker-build
+	docker push $(DOCKER_IMAGE):$(DOCKER_TAG)
+	@if [ "$(DOCKER_TAG)" != "latest" ]; then docker push $(DOCKER_IMAGE):latest; fi
+	@echo "Pushed $(DOCKER_IMAGE):$(DOCKER_TAG)"
+
+terraform:
+	cd deploy/terraform && cp terraform.tfvars.example terraform.tfvars && terraform init && terraform apply
+
+ansible:
+	cd deploy/ansible && ansible-playbook -i inventory.ini playbook.yml -e github_token=$(GITHUB_TOKEN) -e irc_server=irc.h4ks.com

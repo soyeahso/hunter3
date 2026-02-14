@@ -1,0 +1,290 @@
+---
+# Ansible playbook: Provision a Debian Lightsail VPS with hunter3 + GitHub Copilot CLI
+#
+# Usage:
+#   ansible-playbook -i inventory.ini playbook.yml
+#
+# The playbook expects these variables (set in vars below or override with -e):
+#   hunter3_user          - system user that runs hunter3 (default: genoeg)
+#   hunter3_repo          - git clone URL
+#   github_token          - GitHub personal access token (for gh auth)
+#   brave_api_key         - Brave Search API key (optional)
+#   irc_server            - IRC server hostname
+#   irc_port              - IRC server port
+#   irc_nick              - IRC bot nick
+#   irc_channels          - IRC channels to join
+#   irc_use_tls           - use TLS for IRC
+#   irc_password          - IRC server password (optional)
+#   irc_sasl              - enable SASL (optional)
+
+- name: Provision hunter3 with GitHub Copilot CLI
+  hosts: hunter3
+  become: true
+
+  vars:
+    hunter3_user: genoeg
+    hunter3_repo: https://github.com/soyeahso/hunter3.git
+    hunter3_home: "/home/{{ hunter3_user }}"
+    hunter3_src: "{{ hunter3_home }}/go/src/github.com/soyeahso/hunter3"
+    go_version: "1.24.4"
+    node_major: "22"
+    irc_server: irc.libera.chat
+    irc_port: 6667
+    irc_nick: hunter3
+    irc_channels: '["#hunter3"]'
+    irc_use_tls: false
+    irc_password: ""
+    irc_sasl: false
+    brave_api_key: ""
+    github_token: ""
+
+  tasks:
+    # ── System packages ─────────────────────────────────────────────
+    - name: Update and upgrade apt packages
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: dist
+        cache_valid_time: 3600
+
+    - name: Install base packages
+      ansible.builtin.apt:
+        name:
+          - acl
+          - git
+          - gh
+          - make
+          - curl
+          - wget
+          - unzip
+          - jq
+          - ca-certificates
+          - gnupg
+          - sudo
+        state: present
+
+    # ── Create user ─────────────────────────────────────────────────
+    - name: Create hunter3 user
+      ansible.builtin.user:
+        name: "{{ hunter3_user }}"
+        shell: /bin/bash
+        create_home: true
+        groups: sudo
+        append: true
+
+    - name: Allow passwordless sudo
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers.d/{{ hunter3_user }}
+        line: "{{ hunter3_user }} ALL=(ALL) NOPASSWD:ALL"
+        create: true
+        mode: "0440"
+        validate: "visudo -cf %s"
+
+    # ── Install Go ──────────────────────────────────────────────────
+    - name: Check if Go is installed
+      ansible.builtin.stat:
+        path: "{{ hunter3_home }}/.go/bin/go"
+      register: go_binary
+
+    - name: Install Go via goinstall.sh
+      when: not go_binary.stat.exists
+      become: true
+      become_user: "{{ hunter3_user }}"
+      block:
+        - name: Clone golang-tools-install-script
+          ansible.builtin.git:
+            repo: https://github.com/soyeahso/golang-tools-install-script
+            dest: "{{ hunter3_home }}/golang-tools-install-script"
+            version: HEAD
+
+        - name: Run Go installer
+          ansible.builtin.shell: |
+            cd {{ hunter3_home }}/golang-tools-install-script
+            bash goinstall.sh
+          args:
+            creates: "{{ hunter3_home }}/.go/bin/go"
+
+    - name: Ensure Go is in PATH via .bashrc
+      ansible.builtin.lineinfile:
+        path: "{{ hunter3_home }}/.bashrc"
+        line: "{{ item }}"
+        create: true
+        owner: "{{ hunter3_user }}"
+        group: "{{ hunter3_user }}"
+      loop:
+        - 'export GOROOT="{{ hunter3_home }}/.go"'
+        - 'export GOPATH="{{ hunter3_home }}/go"'
+        - 'export PATH="$GOROOT/bin:$GOPATH/bin:$PATH"'
+
+    # ── Install Node.js (for Copilot CLI) ───────────────────────────
+    - name: Add NodeSource GPG key
+      ansible.builtin.shell: |
+        curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /usr/share/keyrings/nodesource.gpg
+      args:
+        creates: /usr/share/keyrings/nodesource.gpg
+
+    - name: Add NodeSource repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_{{ node_major }}.x nodistro main"
+        filename: nodesource
+        state: present
+
+    - name: Install Node.js
+      ansible.builtin.apt:
+        name: nodejs
+        state: present
+        update_cache: true
+
+    # ── Install GitHub Copilot CLI ──────────────────────────────────
+    - name: Install GitHub Copilot CLI via npm
+      ansible.builtin.npm:
+        name: "@githubnext/github-copilot-cli"
+        global: true
+        state: present
+
+    # ── GitHub CLI auth ─────────────────────────────────────────────
+    - name: Authenticate gh CLI
+      when: github_token | length > 0
+      become: true
+      become_user: "{{ hunter3_user }}"
+      ansible.builtin.shell: |
+        echo "{{ github_token }}" | gh auth login --with-token
+      args:
+        creates: "{{ hunter3_home }}/.config/gh/hosts.yml"
+      no_log: true
+
+    # ── Clone & build hunter3 ───────────────────────────────────────
+    - name: Create Go source directory
+      become: true
+      become_user: "{{ hunter3_user }}"
+      ansible.builtin.file:
+        path: "{{ hunter3_home }}/go/src/github.com/soyeahso"
+        state: directory
+        mode: "0755"
+
+    - name: Clone hunter3 repository
+      become: true
+      become_user: "{{ hunter3_user }}"
+      ansible.builtin.git:
+        repo: "{{ hunter3_repo }}"
+        dest: "{{ hunter3_src }}"
+        version: HEAD
+
+    - name: Build hunter3
+      become: true
+      become_user: "{{ hunter3_user }}"
+      ansible.builtin.shell: |
+        export GOROOT="{{ hunter3_home }}/.go"
+        export GOPATH="{{ hunter3_home }}/go"
+        export PATH="$GOROOT/bin:$GOPATH/bin:$PATH"
+        cd {{ hunter3_src }}
+        make build
+        make all
+      args:
+        creates: "{{ hunter3_src }}/dist/hunter3"
+
+    # ── Configure MCP servers for Copilot ───────────────────────────
+    - name: Build MCP servers and generate Copilot config
+      become: true
+      become_user: "{{ hunter3_user }}"
+      ansible.builtin.shell: |
+        export GOROOT="{{ hunter3_home }}/.go"
+        export GOPATH="{{ hunter3_home }}/go"
+        export PATH="$GOROOT/bin:$GOPATH/bin:$PATH"
+        cd {{ hunter3_src }}
+        make -f Makefile.copilot mcp-config
+      args:
+        creates: "{{ hunter3_home }}/.hunter3/mcp-servers.json"
+
+    # ── Create hunter3 config ───────────────────────────────────────
+    - name: Create hunter3 config directory
+      become: true
+      become_user: "{{ hunter3_user }}"
+      ansible.builtin.file:
+        path: "{{ hunter3_home }}/.hunter3"
+        state: directory
+        mode: "0755"
+
+    - name: Write hunter3 config.yaml
+      become: true
+      become_user: "{{ hunter3_user }}"
+      ansible.builtin.copy:
+        dest: "{{ hunter3_home }}/.hunter3/config.yaml"
+        mode: "0644"
+        content: |
+          cli: copilot
+
+          gateway:
+            port: 18789
+            bind: loopback
+            auth:
+              mode: token
+
+          logging:
+            level: info
+            consoleLevel: info
+            consoleStyle: pretty
+
+          channels:
+            irc:
+              server: {{ irc_server }}
+              port: {{ irc_port }}
+              nick: {{ irc_nick }}
+              channels: {{ irc_channels }}
+              useTLS: {{ irc_use_tls }}
+              {% if irc_password | length > 0 %}
+              password: "{{ irc_password }}"
+              {% endif %}
+              {% if irc_sasl %}
+              sasl: true
+              {% endif %}
+              opOnly: true
+              stream: true
+
+          agents:
+            defaults: {}
+
+          session:
+            scope: per-sender
+            store: sqlite
+
+    # ── Environment file ────────────────────────────────────────────
+    - name: Write .env file
+      become: true
+      become_user: "{{ hunter3_user }}"
+      ansible.builtin.copy:
+        dest: "{{ hunter3_src }}/.env"
+        mode: "0600"
+        content: |
+          {% if brave_api_key | length > 0 %}
+          export BRAVE_API_KEY={{ brave_api_key }}
+          {% endif %}
+
+    # ── Systemd service ─────────────────────────────────────────────
+    - name: Install hunter3 systemd service
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/hunter3.service
+        mode: "0644"
+        content: |
+          [Unit]
+          Description=hunter3 AI Gateway
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          Type=simple
+          User={{ hunter3_user }}
+          WorkingDirectory={{ hunter3_src }}
+          EnvironmentFile=-{{ hunter3_src }}/.env
+          ExecStart={{ hunter3_src }}/dist/hunter3 gateway run
+          Restart=on-failure
+          RestartSec=5
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Enable and start hunter3 service
+      ansible.builtin.systemd:
+        name: hunter3
+        enabled: true
+        state: started
+        daemon_reload: true
