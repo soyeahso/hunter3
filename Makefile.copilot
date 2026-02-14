@@ -67,6 +67,7 @@ mcp-config:
 	@echo '    }'                                                                     >> $(BUILD_DIR)/mcp-servers.json
 	@echo '  }'                                                                       >> $(BUILD_DIR)/mcp-servers.json
 	@echo '}'                                                                         >> $(BUILD_DIR)/mcp-servers.json
+	@mkdir -p $(HOME)/.hunter3
 	@mv $(BUILD_DIR)/mcp-servers.json $(HOME)/.hunter3/mcp-servers.json
 	@echo "MCP server config written to $(HOME)/.hunter3/mcp-servers.json"
 	@echo "Use with: copilot --additional-mcp-config @$(shell readlink -f $(HOME)/.hunter3/mcp-servers.json)"
