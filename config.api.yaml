@@ -1,0 +1,155 @@
+# Hunter3 Configuration - Direct API Mode Examples
+#
+# This file demonstrates using Hunter3 with direct HTTP API clients
+# instead of CLI wrappers. Use one of the provider configurations below.
+
+# ============================================================================
+# EXAMPLE 1: Claude API (Anthropic)
+# ============================================================================
+# Requires: An Anthropic API key from https://console.anthropic.com
+#
+cli: none
+apiProvider: claude
+apiKey: sk-ant-YOUR_API_KEY_HERE
+apiModel: claude-3-5-sonnet
+
+gateway:
+  port: 18789
+  bind: loopback          # loopback | lan | custom | tailnet
+  auth:
+    mode: token           # token | password
+
+channels:
+  irc:
+    server: irc.libera.chat
+    port: 6667
+    nick: hunter3
+    channels:
+      - "#hunter3"
+    useTLS: false
+    opOnly: true
+
+agents:
+  defaults:
+    model: sonnet         # Uses the apiModel defined above
+    maxTokens: 4096
+    temperature: 0.7
+  list:
+    - id: default
+      default: true
+      name: Hunter3
+
+session:
+  scope: per-sender       # per-sender | global
+  idleMinutes: 30
+  store: sqlite           # sqlite | memory
+
+logging:
+  level: info
+  consoleLevel: info
+  consoleStyle: pretty    # pretty | compact | json
+
+# ============================================================================
+# EXAMPLE 2: Gemini API (Google)
+# ============================================================================
+# Requires: A Google AI API key from https://aistudio.google.com/app/apikey
+#
+# Uncomment and modify this section, then comment out the Claude section above
+#
+# cli: none
+# apiProvider: gemini
+# apiKey: AIzaSyD_YOUR_API_KEY_HERE
+# apiModel: gemini-2.0
+#
+# gateway:
+#   port: 18789
+#   bind: loopback
+#   auth:
+#     mode: token
+#
+# channels:
+#   irc:
+#     server: irc.libera.chat
+#     port: 6667
+#     nick: hunter3
+#     channels:
+#       - "#hunter3"
+#     useTLS: false
+#     opOnly: true
+#
+# agents:
+#   defaults:
+#     model: gemini        # Uses the apiModel defined above
+#     maxTokens: 2048
+#     temperature: 0.7
+#
+# session:
+#   scope: per-sender
+#   store: sqlite
+#
+# logging:
+#   level: info
+#   consoleStyle: pretty
+
+# ============================================================================
+# EXAMPLE 3: Ollama (Local LLM)
+# ============================================================================
+# Requires: Ollama running locally or on a network
+# Download from: https://ollama.ai
+# Run: ollama serve
+#
+# Uncomment and modify this section, then comment out the Claude section above
+#
+# cli: none
+# apiProvider: ollama
+# apiModel: llama2              # or neural-chat, mistral, etc.
+# apiEndpoint: http://localhost:11434   # Default Ollama endpoint
+#
+# gateway:
+#   port: 18789
+#   bind: loopback
+#   auth:
+#     mode: token
+#
+# channels:
+#   irc:
+#     server: irc.libera.chat
+#     port: 6667
+#     nick: hunter3
+#     channels:
+#       - "#hunter3"
+#     useTLS: false
+#     opOnly: true
+#
+# agents:
+#   defaults:
+#     model: llama2         # Uses the apiModel defined above
+#     maxTokens: 2048
+#     temperature: 0.7
+#
+# session:
+#   scope: per-sender
+#   store: sqlite
+#
+# logging:
+#   level: info
+#   consoleStyle: pretty
+
+# ============================================================================
+# OPTIONAL: Additional Configuration Sections
+# ============================================================================
+#
+# These sections are the same regardless of which provider you use.
+#
+# hooks:
+#   messageReceived:
+#     - command: "echo received"
+#       timeout: 5000
+#   messageSending:
+#     - command: "echo sending"
+#       timeout: 5000
+#
+# memory:
+#   enabled: true
+#   store: sqlite           # sqlite | memory
+#   searchMode: fts         # fts | embedding
