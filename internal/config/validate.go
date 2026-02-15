@@ -112,5 +112,46 @@ func Validate(cfg *Config) []ValidationIssue {
 		}
 	}
 
+	// CLI/API validation
+	validCLIModes := []string{"", "none", "claude", "copilot"}
+	if cfg.CLI != "" && !slices.Contains(validCLIModes, cfg.CLI) {
+		issues = append(issues, ValidationIssue{
+			Path:    "cli",
+			Message: fmt.Sprintf("must be one of %v, got %q", validCLIModes, cfg.CLI),
+		})
+	}
+
+	// If cli: none, validate API config
+	if cfg.CLI == "none" {
+		if cfg.APIProvider == "" {
+			issues = append(issues, ValidationIssue{
+				Path:    "apiProvider",
+				Message: "required when cli: none",
+			})
+		}
+
+		validProviders := []string{"claude", "gemini", "ollama"}
+		if cfg.APIProvider != "" && !slices.Contains(validProviders, cfg.APIProvider) {
+			issues = append(issues, ValidationIssue{
+				Path:    "apiProvider",
+				Message: fmt.Sprintf("must be one of %v, got %q", validProviders, cfg.APIProvider),
+			})
+		}
+
+		if cfg.APIProvider != "ollama" && cfg.APIKey == "" {
+			issues = append(issues, ValidationIssue{
+				Path:    "apiKey",
+				Message: "required when cli: none (except for ollama)",
+			})
+		}
+
+		if cfg.APIModel == "" {
+			issues = append(issues, ValidationIssue{
+				Path:    "apiModel",
+				Message: "required when cli: none",
+			})
+		}
+	}
+
 	return issues
 }

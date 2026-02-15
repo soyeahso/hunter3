@@ -29,7 +29,7 @@ func newAgentListCmd() *cobra.Command {
 				cfg = config.Defaults()
 			}
 
-			registry := llm.NewRegistryFromConfig(cfg.Models, cfg.CLI, log)
+			registry := llm.NewRegistryFromConfig(cfg.Models, cfg.CLI, cfg.APIProvider, cfg.APIKey, cfg.APIModel, cfg.APIEndpoint, log)
 			providers := registry.List()
 
 			if len(cfg.Agents.List) == 0 {
@@ -72,7 +72,7 @@ func newAgentInfoCmd() *cobra.Command {
 				cfg = config.Defaults()
 			}
 
-			registry := llm.NewRegistryFromConfig(cfg.Models, cfg.CLI, log)
+			registry := llm.NewRegistryFromConfig(cfg.Models, cfg.CLI, cfg.APIProvider, cfg.APIKey, cfg.APIModel, cfg.APIEndpoint, log)
 			providers := registry.List()
 
 			targetID := ""

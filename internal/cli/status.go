@@ -59,7 +59,7 @@ func newStatusCmd() *cobra.Command {
 			fmt.Printf("Session: store=%s scope=%s\n", store, scope)
 
 			// LLM providers
-			registry := llm.NewRegistryFromConfig(cfg.Models, cfg.CLI, log)
+			registry := llm.NewRegistryFromConfig(cfg.Models, cfg.CLI, cfg.APIProvider, cfg.APIKey, cfg.APIModel, cfg.APIEndpoint, log)
 			providers := registry.List()
 			if len(providers) > 0 {
 				fmt.Printf("LLM:     %s\n", strings.Join(providers, ", "))

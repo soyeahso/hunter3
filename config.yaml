@@ -1,4 +1,10 @@
-cli: claude              # "claude" | "copilot" — selects the primary CLI provider
+cli: claude              # "claude" | "copilot" | "none" — selects the primary CLI provider or "none" for direct API
+
+# If cli: none, configure API access below
+# apiProvider: claude     # "claude" | "gemini" | "ollama"
+# apiKey: sk-ant-...      # API key (not needed for ollama)
+# apiModel: claude-3-5-sonnet  # Model ID to use
+# apiEndpoint: http://localhost:11434  # Optional: custom endpoint (for ollama)
 
 gateway:
   port: 18789

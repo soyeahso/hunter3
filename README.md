@@ -83,7 +83,42 @@ Configuration is stored in `~/.hunter3/config.yaml`.
 
 The database lives at `~/.hunter3/data/hunter3.db`.
 
+### LLM Providers
+
+Hunter3 supports two modes for LLM integration:
+
+**1. CLI-based (default) - `cli: claude` or `cli: copilot`**
+
+Uses installed CLI tools which manage authentication, caching, and rate limiting:
+
 ```yaml
+cli: claude   # or "copilot", "gemini", "ollama"
+```
+
+Requires the corresponding CLI tool installed and in PATH.
+
+**2. Direct API - `cli: none`**
+
+Uses HTTP APIs directly with explicit authentication:
+
+```yaml
+cli: none
+apiProvider: claude      # "claude", "gemini", or "ollama"
+apiKey: sk-ant-...       # API key (not needed for ollama)
+apiModel: claude-3-5-sonnet
+# apiEndpoint: http://localhost:11434  # Optional: for custom ollama endpoint
+```
+
+### Full Configuration Example
+
+```yaml
+# LLM Provider configuration
+cli: claude              # "claude" | "copilot" | "none"
+
+# If cli: none, configure API access below
+# apiProvider: claude
+# apiKey: sk-ant-...
+# apiModel: claude-3-5-sonnet
 gateway:
   port: 18789
   bind: loopback          # loopback | lan | custom | tailnet

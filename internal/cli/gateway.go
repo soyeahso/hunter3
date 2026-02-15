@@ -77,7 +77,7 @@ func newGatewayRunCmd() *cobra.Command {
 			}
 
 			// Initialize LLM provider registry and agent runner
-			registry := llm.NewRegistryFromConfig(cfg.Models, cfg.CLI, log)
+			registry := llm.NewRegistryFromConfig(cfg.Models, cfg.CLI, cfg.APIProvider, cfg.APIKey, cfg.APIModel, cfg.APIEndpoint, log)
 			providers := registry.List()
 
 			// Initialize session store (SQLite or in-memory)

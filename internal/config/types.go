@@ -3,15 +3,19 @@ package config
 // Config is the root configuration for Hunter3.
 // Fields mirror the TypeScript Hunter3Config, scoped to what the Go rewrite needs.
 type Config struct {
-	CLI      string         `yaml:"cli,omitempty"` // "claude" | "copilot" — selects the primary CLI provider
-	Gateway  GatewayConfig  `yaml:"gateway,omitempty"`
-	Models   ModelsConfig   `yaml:"models,omitempty"`
-	Agents   AgentsConfig   `yaml:"agents,omitempty"`
-	Channels ChannelsConfig `yaml:"channels,omitempty"`
-	Session  SessionConfig  `yaml:"session,omitempty"`
-	Logging  LoggingConfig  `yaml:"logging,omitempty"`
-	Hooks    HooksConfig    `yaml:"hooks,omitempty"`
-	Memory   MemoryConfig   `yaml:"memory,omitempty"`
+	CLI          string         `yaml:"cli,omitempty"` // "claude" | "copilot" | "none" — selects the primary CLI provider or "none" for direct API
+	APIProvider  string         `yaml:"apiProvider,omitempty"` // "claude" | "gemini" | "ollama" — used when cli: none
+	APIKey       string         `yaml:"apiKey,omitempty"` // API key for direct API access
+	APIModel     string         `yaml:"apiModel,omitempty"` // Model ID when using direct API
+	APIEndpoint  string         `yaml:"apiEndpoint,omitempty"` // Custom API endpoint (for Ollama)
+	Gateway      GatewayConfig  `yaml:"gateway,omitempty"`
+	Models       ModelsConfig   `yaml:"models,omitempty"`
+	Agents       AgentsConfig   `yaml:"agents,omitempty"`
+	Channels     ChannelsConfig `yaml:"channels,omitempty"`
+	Session      SessionConfig  `yaml:"session,omitempty"`
+	Logging      LoggingConfig  `yaml:"logging,omitempty"`
+	Hooks        HooksConfig    `yaml:"hooks,omitempty"`
+	Memory       MemoryConfig   `yaml:"memory,omitempty"`
 }
 
 // GatewayConfig controls the gateway HTTP/WebSocket server.

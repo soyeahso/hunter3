@@ -103,19 +103,56 @@ func (r *Registry) List() []string {
 	return names
 }
 
-// NewRegistryFromConfig builds a Registry by auto-detecting available CLI tools.
-// The cli parameter selects the primary CLI provider ("claude", "copilot", or ""
-// for auto-detect). It registers the selected CLI plus any providers from config.
-func NewRegistryFromConfig(cfg config.ModelsConfig, cli string, log *logging.Logger) *Registry {
+// NewRegistryFromConfig builds a Registry by auto-detecting available CLI tools or using API clients.
+// The cli parameter selects the primary CLI provider ("claude", "copilot", "none", or ""
+// for auto-detect). When cli="none", uses API clients configured via apiProvider, apiKey, apiModel.
+func NewRegistryFromConfig(cfg config.ModelsConfig, cliMode string, apiProvider, apiKey, apiModel, apiEndpoint string, log *logging.Logger) *Registry {
 	reg := NewRegistry(log)
 
-	cli = strings.ToLower(strings.TrimSpace(cli))
+	cliMode = strings.ToLower(strings.TrimSpace(cliMode))
+
+	// If cli: none, register API client instead of CLI
+	if cliMode == "none" {
+		switch apiProvider {
+		case "claude":
+			if apiKey != "" && apiModel != "" {
+				client := NewClaudeAPIClient(apiKey, apiModel)
+				reg.Register("claude", client)
+				reg.SetFallback("claude")
+				for _, alias := range []string{"sonnet", "opus", "haiku", "claude-sonnet", "claude-opus", "claude-haiku"} {
+					reg.Alias(alias, "claude")
+				}
+			}
+
+		case "gemini":
+			if apiKey != "" && apiModel != "" {
+				client := NewGeminiAPIClient(apiKey, apiModel)
+				reg.Register("gemini", client)
+				reg.SetFallback("gemini")
+				for _, alias := range []string{"gemini-pro", "gemini-2.0"} {
+					reg.Alias(alias, "gemini")
+				}
+			}
+
+		case "ollama":
+			if apiModel != "" {
+				// apiEndpoint defaults to http://localhost:11434 if not provided
+				client := NewOllamaAPIClient(apiEndpoint, apiModel)
+				reg.Register("ollama", client)
+				reg.SetFallback("ollama")
+				for _, alias := range []string{"llama", "llama2", "llama3", "mistral"} {
+					reg.Alias(alias, "ollama")
+				}
+			}
+		}
+		return reg
+	}
 
 	// Register Claude Code CLI
-	if (cli == "" || cli == "claude") && CLIExists("claude") {
+	if (cliMode == "" || cliMode == "claude") && CLIExists("claude") {
 		client := NewClaudeClient(log)
 		reg.Register("claude", client)
-		if cli == "" || cli == "claude" {
+		if cliMode == "" || cliMode == "claude" {
 			reg.SetFallback("claude")
 		}
 		for _, alias := range []string{"sonnet", "opus", "haiku", "claude-sonnet", "claude-opus", "claude-haiku"} {
@@ -124,10 +161,10 @@ func NewRegistryFromConfig(cfg config.ModelsConfig, cli string, log *logging.Log
 	}
 
 	// Register GitHub Copilot CLI
-	if (cli == "" || cli == "copilot") && CLIExists("copilot") {
+	if (cliMode == "" || cliMode == "copilot") && CLIExists("copilot") {
 		client := NewCopilotClient(log)
 		reg.Register("copilot", client)
-		if cli == "copilot" {
+		if cliMode == "copilot" {
 			reg.SetFallback("copilot")
 		}
 		for _, alias := range []string{"gpt-5", "claude-sonnet-4.5", "copilot-agent"} {

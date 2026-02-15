@@ -86,7 +86,7 @@ func TestNewRegistryFromConfig(t *testing.T) {
 			"gemini": {API: "google-generative-ai"},
 		},
 	}
-	reg := NewRegistryFromConfig(cfg, "", silentLog())
+	reg := NewRegistryFromConfig(cfg, "", "", "", "", "", silentLog())
 	assert.NotNil(t, reg)
 }
 

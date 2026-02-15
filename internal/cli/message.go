@@ -44,7 +44,7 @@ func newMessageSendCmd() *cobra.Command {
 				cfg = config.Defaults()
 			}
 
-			registry := llm.NewRegistryFromConfig(cfg.Models, cfg.CLI, log)
+			registry := llm.NewRegistryFromConfig(cfg.Models, cfg.CLI, cfg.APIProvider, cfg.APIKey, cfg.APIModel, cfg.APIEndpoint, log)
 			providers := registry.List()
 			if len(providers) == 0 {
 				return fmt.Errorf("no LLM providers available")
